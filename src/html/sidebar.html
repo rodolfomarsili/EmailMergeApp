@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    .tabcontent {
+      padding: 20px;
+      display: none;
+    }
+
+    .tabcontent.active {
+      display: block;
+    }
+
+    .input-size {
+      max-width: 250px;
+      max-height: 40px;
+    }
+
+    .progress .progress-bar.active {
+        font-weight: 700;
+        animation: progress-bar-stripes .5s linear infinite;
+    }
+
+    .dotdotdot:after {
+        font-weight: 300;
+        content: '...';
+        display: inline-block;
+        width: 20px;
+        text-align: left;
+        animation: dotdotdot 1.5s linear infinite;
+    }
+
+    @keyframes dotdotdot {
+      0%   { content: '...'; }
+      25% { content: ''; }
+      50% { content: '.'; }
+      75% { content: '..'; }
+    }
+
+    .chips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .chip {
+      display: flex;
+      border: none;
+      align-items: center;
+      background-color: #e0e0e0;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin: 2px;
+      font-size: 12px;
+      height: 30px;
+    }
+
+    .close-btn { 
+      background: none;
+      border: none;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+      justify-content: flex-end;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <ul class="nav nav-tabs" id="tabMenu">
+
+    <li class="nav-item">
+      <a class="nav-link active" aria-current="page" href="#" onclick="openTab(event, 'mail-merge')">Merge</a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" aria-current="page" href="#" onclick="openTab(event, 'checks')">Checks</a> 
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link" aria-current="page" href="#" onclick="openTab(event, 'settings')">Settings</a>
+    </li>
+
+  </ul> 
+
+
+  
+  <div class="tabcontent active" id="mail-merge">
+
+      <div class="form-check form-switch mb-3" id="container_capitalize_text">
+        <input class="form-check-input" type="checkbox" role="switch" id="switch_capitalize_text" checked>
+        <label class="form-check-label text-body-secondary" for="switch_capitalize_text">Capitalize Text</label>
+      </div>
+
+      <div class="form-check form-switch mb-3" id="container_replace_placeholders">
+        <input class="form-check-input" type="checkbox" role="switch" id="switch_replace_placeholders" checked>
+        <label class="form-check-label text-body-secondary" for="switch_replace_placeholders">Replace placeholders</label>
+      </div>
+
+      <div class="form-check form-switch mb-3" id="container_use_signature">
+        <input class="form-check-input" type="checkbox" role="switch" id="switch_use_signature" checked>
+        <label class="form-check-label text-body-secondary" for="switch_use_signature">Use signature</label>
+      </div>
+
+      <hr/>
+
+      <select class="form-control" id="tags_input" required></select>
+      <div class="chips-container mt-2" id="tags_container"></div>
+
+      <hr/>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">
+          <span class="spinner-border spinner-grow-sm ms-auto" id="spinner_show_template" style="display: none;" role="status" aria-hidden="true"></span>
+        </span>
+        <input type="text" class="form-control text-center" placeholder="Show Template" disabled>
+        <button class="btn btn-primary" type="button" id="btn_show_template">
+          <i class="bi bi-file-richtext"></i>
+        </button>
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">
+          <span class="spinner-border spinner-grow-sm ms-auto" id="spinner_send_emails" style="display: none;" role="status" aria-hidden="true"></span>
+        </span>
+        <input type="text" class="form-control text-center" placeholder="Send Emails" disabled>
+        <button class="btn btn-primary" type="button" id="btn_send_emails">
+          <i class="bi bi-send"></i>
+        </button>
+      </div>
+
+      <div class="input-group mb-3">
+        <span class="input-group-text">
+          <span class="spinner-border spinner-grow-sm ms-auto" id="spinner_refresh_templates" style="display: none;" role="status" aria-hidden="true"></span>
+        </span>
+        <input type="text" class="form-control text-center" placeholder="Refresh Templates" disabled>
+        <button class="btn btn-primary" type="button" id="btn_refresh_templates">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+
+      <div class="input-group mb-3">
+      <span class="input-group-text">
+        <span class="spinner-border spinner-grow-sm ms-auto" id="spinner_clean_sheet" style="display: none;" role="status" aria-hidden="true"></span>
+      </span>
+      <input type="text" class="form-control text-center" placeholder="Clean Sheet" disabled>
+      <button class="btn btn-primary" type="button" id="btn_clean_sheet">
+        <i class="bi bi-eraser"></i>
+      </button>
+    </div>
+  
+  </div>
+
+
+  <div class="tabcontent" id="checks">
+
+    <div class="mb-3">
+      <label for="input_date_from">From:</label>
+      <input type="date" class="form-control input-size" id="input_date_from">
+    </div>
+
+    <div class="mb-3">
+      <label for="input_date_to">To:</label>
+      <input type="date" class="form-control input-size" id="input_date_to">
+    </div>
+
+    <div class="form-check form-check-reverse">
+      <input class="form-check-input" type="checkbox" value="" id="checkbox_use_date_ranges" checked>
+      <label class="form-check-label" for="checkbox_use_date_ranges">
+        Use date ranges
+      </label>
+    </div>
+
+    <hr/>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">
+        <span class="spinner-border spinner-grow-sm ms-auto" id="spinner_check_undelivered_emails" style="display: none;" role="status" aria-hidden="true"></span>
+      </span>
+      <input type="text" class="form-control text-center" placeholder="Undelivered Emails" disabled>
+      <button class="btn btn-primary" type="button" id="btn_check_undelivered_emails">
+        <i class="bi bi-slash-circle"></i>
+      </button>
+    </div>
+
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">
+        <span class="spinner-border spinner-grow-sm ms-auto" id="spinner_check_responses" style="display: none;" role="status" aria-hidden="true"></span>
+      </span>
+      <input type="text" class="form-control text-center" placeholder="Responses to Emails" disabled>
+      <button class="btn btn-primary" type="button" id="btn_check_responses">
+        <i class="bi bi-check-circle"></i>
+      </button>
+    </div>
+
+  </div>
+
+
+
+  <div class="tabcontent" id="settings">
+    <form class="needs-validation" novalidate> 
+    
+      <div class="form-floating mb-3" id="name">
+        <input type="text" class="form-control input-size" id="input_name" placeholder="Name" required>
+        </input>
+        <label for="input_name">From Name</label>
+        <div class="invalid-feedback" id="input_name_feedback">
+          Please enter your name.
+        </div>
+      </div>
+
+      <div class="form-floating mb-3">
+        <input type="email" class="form-control input-size" id="input_email" placeholder="Email" required>
+        <label for="input_email">From Email</label>
+        <div class="invalid-feedback">
+          Please enter a valid email.
+        </div>
+      </div>
+
+      <div class="d-grid">
+        <button class="btn btn-outline-secondary mb-1" type="button" id="btn_save">
+          <i class="bi bi-floppy"></i>
+          Save
+        </button>
+        <div class="progress d-none" role="progressbar" aria-label="Animated striped example" style="height: 15px" id="progress_bar_save">
+          <div class="progress-bar progress-bar-striped progress-bar-animated w-100">
+            <span>Please wait<span class="dotdotdot"></span></span>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+
+
+    
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="container_toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto" id="text_toast_header">Header</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" id="text_toast_body">Body</div>
+    </div>
+  </div>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.js"></script>
+  <script>
+
+    let userData = JSON.parse(<?= userData ?>);
+    let labels = JSON.parse(<?= labels ?>);
+
+    function openTab(event, tabId) {
+      let tabContents = document.querySelectorAll(".tabcontent");
+      tabContents.forEach(tab => tab.classList.remove("active"));
+
+      let tabLinks = document.querySelectorAll(".nav-link");
+      tabLinks.forEach(link => link.classList.remove("active"));
+
+      document.getElementById(tabId).classList.add("active");
+      event.currentTarget.classList.add("active");
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeInput("input_name", userData?.name)
+      initializeInput("input_email", userData?.email)
+      initializeInputDate("input_date_from")
+      initializeInputDate("input_date_to")
+      initializeSelect('tags_input', labels, "Add Label");
+      initializeTagsSection('tags_input', 'tags_container');
+
+      document.getElementById("input_name").addEventListener('input', handleInputChange);
+      document.getElementById("input_email").addEventListener('input', handleInputChange);
+      document.getElementById("btn_save").addEventListener('click', saveSettings);
+      document.getElementById("btn_show_template").addEventListener('click', showSelectedTemplate);
+      document.getElementById("btn_send_emails").addEventListener('click', sendEmails);
+      document.getElementById("btn_refresh_templates").addEventListener('click', refreshTemplates);
+
+      document.getElementById("input_date_from").addEventListener("change", handleDateChange);
+      document.getElementById("input_date_to").addEventListener('change', handleDateChange);
+      document.getElementById("checkbox_use_date_ranges").addEventListener('change', handleCheckboxChange);      
+      document.getElementById("btn_clean_sheet").addEventListener('click', cleanSheet);
+      document.getElementById("btn_check_undelivered_emails").addEventListener('click', checkUndeliveredEmails);
+      document.getElementById("btn_check_responses").addEventListener('click', checkResponses);
+    });
+
+    function initializeInput(elementId, initialValue) {
+      let element = document.getElementById(elementId);
+      element.value = initialValue || "";
+    }
+
+    function initializeSwitch(elementId, value) {
+      let element = document.getElementById(elementId);
+      element.checked = value === "true"
+    }
+
+    function initializeInputDate(elementId) {
+      let element = document.getElementById(elementId);
+      let today = new Date().toISOString().split("T")[0];
+      element.value = today;
+    }
+
+    function initializeSelect(elementId, dataArray, initialValue) {
+      let element = document.getElementById(elementId);
+      element.innerHTML = ''; 
+      let fragment = document.createDocumentFragment();
+      let createOption = (value, text, selected = false, disabled = false) => {
+        let option = document.createElement("option");
+        option.value = value;
+        option.textContent = text;
+        if (selected) option.selected = true;
+        if (disabled) option.disabled = true;
+        return option;
+      };
+      fragment.appendChild(createOption('', initialValue, true, true));
+      dataArray.forEach(item => {
+        fragment.appendChild(createOption(item, item));
+      });
+      element.appendChild(fragment);
+    }
+
+    function isInputValid(elementId, isValid) {
+      let element = document.getElementById(elementId);
+      element.classList.toggle("is-invalid", !isValid);
+      element.classList.toggle("is-valid", isValid);
+      if (isValid === "none") {
+        element.classList.remove("is-invalid");
+        element.classList.remove("is-valid");
+      }
+    }
+
+    function validateInput(elementId, value) {
+      let isValid = value !== "";
+      isInputValid(elementId, isValid);
+      return isValid;
+    }
+
+    function isEmailValid(elementId) {
+      let element = document.getElementById(elementId);
+      let email = element.value;
+      let emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,26}$/;
+      let isValid = emailRegex.test(email);
+      isInputValid(elementId, isValid);
+      return isValid
+    }
+
+    function showBorder(element, condition) {
+      element.classList.toggle("border", condition);
+      element.classList.toggle("border-warning", condition);
+    }
+
+    function handleInputChange(event) {
+      let { value, id } = event.target;
+      let originalValue = userData?.[id.replace('input_', '')];
+      showBorder(event.target, value.trim() !== originalValue);
+    }
+
+    function handleSwitchChange(event) {
+      let { checked, id } = event.target;
+      let originalValue = userData?.[id.replace('switch_', '')];
+      let container = document.getElementById(id.replace('switch', 'container'));
+      showBorder(container, checked.toString() !== originalValue);
+    }
+
+    function handleDateChange(event) {
+      let dateFromInput = document.getElementById("input_date_from");
+      let dateToInput = document.getElementById("input_date_to");
+
+      let fromDate = new Date(dateFromInput.value);
+      let toDate = new Date(dateToInput.value);
+
+      if (toDate < fromDate) {
+        dateToInput.value = dateFromInput.value;
+        showToast("Warning", "End date cannot be earlier than start date", "warning");
+      }
+    }
+
+    function handleCheckboxChange(event) {
+      let { checked } = event.target;
+      document.getElementById("input_date_from").disabled = !checked;
+      document.getElementById("input_date_to").disabled = !checked;
+    }
+
+    function onProcessSuccess(result, buttonId){
+      isButtonProcessing(buttonId, false)
+      if(result?.title && result?.message && result?.result){
+        showToast(result.title, result.message, result.result)
+      }
+      console.log(result)
+    }
+
+    function onProcessFailure(error, buttonId){
+      isButtonProcessing(buttonId, false)
+      if(error.message.startsWith('Error: ')){
+        error = JSON.parse(error.message.replace('Error: ', ''))
+        if(error?.title && error?.message && error?.result){
+          showToast(error.title, error.message, error.result)
+        }
+      }
+      console.log(error, error.message)
+    }
+
+    function isButtonProcessing(buttonId, isProcessing) {
+      let btn = document.getElementById(buttonId);
+      let spinner = document.getElementById(btn.id.replace('btn', 'spinner'))
+
+      btn.classList.toggle("d-flex", isProcessing);
+      btn.classList.toggle("align-items-center", isProcessing);
+      btn.classList.toggle("px-3", isProcessing);
+      spinner.style.display = isProcessing ? "inline-block" : "none";
+    }
+
+    function getTags(tagsContainerId) {
+      let tags = Array.from(document.getElementById(tagsContainerId).children);
+      return tags.map(tag => tag.textContent.trim().replace('×', ''));
+    }
+
+    function initializeTagsSection(tagsInputId, tagsContainerId){
+      let chipInput = document.getElementById(tagsInputId);
+      let chipsContainer = document.getElementById(tagsContainerId);
+
+      chipInput.addEventListener('change', () => {
+          addChip(chipInput.value);
+          chipInput.selectedIndex = 0;
+      });
+
+      chipInput.addEventListener('keypress', (event) => {
+          if (event.key === 'Enter') {
+              addChip(chipInput.value);
+              chipInput.selectedIndex = 0;
+          }
+      });
+
+      function addChip(text) {
+        if (text.trim() === '') return;
+
+        let existingTags = getTags('tags_container');
+
+        if(existingTags.includes(text)) return;
+
+        let chip = document.createElement('div');
+        chip.className = 'chip';
+        chip.textContent = text;
+
+        let closeBtn = document.createElement('button');
+        closeBtn.className = 'close-btn';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', () => chipsContainer.removeChild(chip));
+
+        chip.appendChild(closeBtn);
+        chipsContainer.appendChild(chip);
+      }
+    }
+
+    function showToast(header, message, alertType){
+      let toastContainer = document.getElementById('container_toast');
+      let toastHeader = document.getElementById("text_toast_header");
+      let toastBody = document.getElementById("text_toast_body");
+
+      toastContainer.className = `toast text-bg-${alertType}`;
+      toastHeader.textContent = header;
+      toastBody.textContent = message;
+      new bootstrap.Toast(toastContainer).show();
+    }
+
+    function formatDate(date) {
+      // Regular expression to validate date format
+      let dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(date)) {
+        throw Error(`Invalid date format: "${date}". Expected YYYY-MM-DD.`);
+      }
+      return date.split('-').join('/');
+    }
+
+    function sumDaysToDate(dateString, days) {
+      //dateString expected to be YYYY/MM/DD
+      let date = new Date(dateString);
+
+      let millisecondsInADay = days*86400000;
+      date.setTime(date.getTime() + millisecondsInADay);
+      
+      let newYear = date.getFullYear();
+      let newMonth = (date.getMonth() + 1).toString().padStart(2, '0'); // Los meses van de 0 a 11, por eso sumamos 1
+      let newDay = date.getDate().toString().padStart(2, '0');
+
+      return `${newYear}/${newMonth}/${newDay}`;
+    }
+
+
+
+    function onSaveSuccess(result) {
+      hideProgressBar(); 
+      if(result?.title && result?.message && result?.result){
+        showToast(result.title, result.message, result.result)
+      }
+      isInputValid("input_name", "none")
+      isInputValid("input_email", "none")
+    }
+
+    function onSaveFailure(error) {
+      hideProgressBar(); 
+      showToast("Error", error.message, "danger");
+      isInputValid("input_name", "none")
+      isInputValid("input_email", "none")
+    }
+
+    function showProgressBar() {
+      document.getElementById("progress_bar_save").classList.remove("d-none");
+    }
+
+    function hideProgressBar() {
+      document.getElementById("progress_bar_save").classList.add("d-none");
+    }
+
+    
+
+    function saveSettings(event) {
+      let name = document.getElementById("input_name").value.trim();
+      let email = document.getElementById("input_email").value.trim();
+      if (!validateInput("input_name", name)) return;
+      if (!validateInput("input_email", email) || !isEmailValid("input_email")) return;
+      showProgressBar();
+      let data = { 
+        name: name, 
+        email: email
+      }
+      google.script
+            .run
+            .withSuccessHandler((result) => onSaveSuccess(result))
+            .withFailureHandler((error) => onSaveFailure(error))
+            .updateUserProperties(JSON.stringify(data));
+    }
+
+    function showSelectedTemplate(event) {
+      let = buttonId = event.currentTarget.id;
+      isButtonProcessing(buttonId, true);
+      let options = {
+        capitalizeText: document.getElementById('switch_capitalize_text').checked,
+        replacePlaceholders: document.getElementById("switch_replace_placeholders").checked,
+        useSignature: document.getElementById("switch_use_signature").checked
+      }
+      google.script
+            .run
+            .withSuccessHandler((result) => onProcessSuccess(result, buttonId))
+            .withFailureHandler((error) => onProcessFailure(error, buttonId))
+            .showSelectedTemplate(JSON.stringify(options));
+    }
+
+    
+
+
+    function sendEmails(event) {
+      let = buttonId = event.currentTarget.id;
+      isButtonProcessing(buttonId, true);
+      let options = {
+        capitalizeText: document.getElementById('switch_capitalize_text').checked,
+        replacePlaceholders: document.getElementById("switch_replace_placeholders").checked,
+        useSignature: document.getElementById("switch_use_signature").checked,
+        labels: getTags('tags_container')
+      }
+      google.script
+            .run
+            .withSuccessHandler((result) => onProcessSuccess(result, buttonId))
+            .withFailureHandler((error) => onProcessFailure(error, buttonId))
+            .sendEmails(JSON.stringify(options));
+    }
+
+
+    function refreshTemplates(event) {
+      let = buttonId = event.currentTarget.id;
+      isButtonProcessing(buttonId, true);
+      google.script
+            .run
+            .withSuccessHandler((result) => onProcessSuccess(result, buttonId))
+            .withFailureHandler((error) => onProcessFailure(error, buttonId))
+            .refreshTemplates()
+    }
+
+    function cleanSheet(event) {
+      let = buttonId = event.currentTarget.id;
+      isButtonProcessing(buttonId, true);
+      google.script
+            .run
+            .withSuccessHandler((result) => onProcessSuccess(result, buttonId))
+            .withFailureHandler((error) => onProcessFailure(error, buttonId))
+            .cleanSheet()
+    }
+
+    function checkUndeliveredEmails(event) {
+      let = buttonId = event.currentTarget.id;
+      isButtonProcessing(buttonId, true);
+      let options = {
+        capitalizeText: document.getElementById('switch_capitalize_text').checked,
+        replacePlaceholders: document.getElementById("switch_replace_placeholders").checked,
+        useSignature: document.getElementById("switch_use_signature").checked,
+        startDate: '',
+        endDate: ''
+      }
+      if(document.getElementById("checkbox_use_date_ranges").checked){
+        options.startDate = formatDate(document.getElementById("input_date_from").value);
+        options.endDate = sumDaysToDate(formatDate(document.getElementById("input_date_to").value), 1);
+      }
+      google.script
+            .run
+            .withSuccessHandler((result) => onProcessSuccess(result, buttonId))
+            .withFailureHandler((error) => onProcessFailure(error, buttonId))
+            .checkUndeliveredEmails(JSON.stringify(options))
+    }
+
+    function checkResponses(event) {
+      let = buttonId = event.currentTarget.id;
+      isButtonProcessing(buttonId, true);
+      let options = {
+        capitalizeText: document.getElementById('switch_capitalize_text').checked,
+        replacePlaceholders: document.getElementById("switch_replace_placeholders").checked,
+        useSignature: document.getElementById("switch_use_signature").checked,
+        startDate: '',
+        endDate: ''
+      }
+      if(document.getElementById("checkbox_use_date_ranges").checked){
+        options.startDate = formatDate(document.getElementById("input_date_from").value);
+        options.endDate = sumDaysToDate(formatDate(document.getElementById("input_date_to").value), 1);
+      }
+      google.script
+            .run
+            .withSuccessHandler((result) => onProcessSuccess(result, buttonId))
+            .withFailureHandler((error) => onProcessFailure(error, buttonId))
+            .checkResponsesToEmails(JSON.stringify(options))
+    }
+
+    //window.onload = initialize;
+  </script>
+</body>
+
+</html>
